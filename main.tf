@@ -1,14 +1,18 @@
 locals {
-  name          = "my-module"
+  name          = "cluster-config"
   bin_dir       = module.setup_clis.bin_dir
   yaml_dir      = "${path.cwd}/.tmp/${local.name}/chart/${local.name}"
-  ingress_host  = "${local.name}-${var.namespace}.${var.cluster_ingress_hostname}"
-  ingress_url   = "https://${local.ingress_host}"
-  service_url   = "http://${local.name}.${var.namespace}"
+  values_file   = "value-${var.server_name}.yaml"
   values_content = {
+    ocp-console-notification = {
+      backgroundColor = var.banner_background_color
+      color = var.banner_text_color
+      text = var.banner_text
+    }
   }
-  layer = "services"
+  layer = "infrastructure"
   application_branch = "main"
+  gitops_url = var.gitops_config.boostrap["argocd-config"].url
   layer_config = var.gitops_config[local.layer]
 }
 
@@ -18,10 +22,11 @@ module setup_clis {
 
 resource null_resource create_yaml {
   provisioner "local-exec" {
-    command = "${path.module}/scripts/create-yaml.sh '${local.name}' '${local.yaml_dir}'"
+    command = "${path.module}/scripts/create-yaml.sh '${local.name}' '${local.yaml_dir}' '${local.values_file}' '${local.gitops_url}'"
 
     environment = {
       VALUES_CONTENT = yamlencode(local.values_content)
+      BIN_DIR = local.bin_dir
     }
   }
 }
@@ -30,7 +35,7 @@ resource null_resource setup_gitops {
   depends_on = [null_resource.create_yaml]
 
   provisioner "local-exec" {
-    command = "${local.bin_dir}/igc gitops-module '${local.name}' -n '${var.namespace}' --contentDir '${local.yaml_dir}' --serverName '${var.server_name}' -l '${local.layer}' --debug"
+    command = "${local.bin_dir}/igc gitops-module '${local.name}' -n '${var.namespace}' --contentDir '${local.yaml_dir}' --serverName '${var.server_name}' -l '${local.layer}' --valueFiles 'values.yaml,${local.values_file}'"
 
     environment = {
       GIT_CREDENTIALS = yamlencode(var.git_credentials)
