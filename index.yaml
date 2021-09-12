@@ -1,11 +1,120 @@
 id: github.com/cloud-native-toolkit/terraform-gitops-cluster-config
-name: ""
+name: gitops-cluster-config
 type: terraform
-description: ""
+description: Module to populate a gitops repository with base configuration of the Red Hat OpenShift cluster (notification banner, help menus, etc)
 tags:
   - tools
   - gitops
+  - cluster config
+  - ocp
 versions:
+  - platforms:
+      - ocp4
+    dependencies:
+      - id: gitops
+        refs:
+          - source: github.com/cloud-native-toolkit/terraform-tools-gitops.git
+            version: ">= 1.1.0"
+      - id: namespace
+        refs:
+          - source: github.com/cloud-native-toolkit/terraform-gitops-namespace.git
+            version: ">= 1.0.0"
+    variables:
+      - name: gitops_config
+        moduleRef:
+          id: gitops
+          output: gitops_config
+        type: |-
+          object({
+              boostrap = object({
+                argocd-config = object({
+                  project = string
+                  repo = string
+                  url = string
+                  path = string
+                })
+              })
+              infrastructure = object({
+                argocd-config = object({
+                  project = string
+                  repo = string
+                  url = string
+                  path = string
+                })
+                payload = object({
+                  repo = string
+                  url = string
+                  path = string
+                })
+              })
+              services = object({
+                argocd-config = object({
+                  project = string
+                  repo = string
+                  url = string
+                  path = string
+                })
+                payload = object({
+                  repo = string
+                  url = string
+                  path = string
+                })
+              })
+              applications = object({
+                argocd-config = object({
+                  project = string
+                  repo = string
+                  url = string
+                  path = string
+                })
+                payload = object({
+                  repo = string
+                  url = string
+                  path = string
+                })
+              })
+            })
+        description: Config information regarding the gitops repo structure
+      - name: git_credentials
+        moduleRef:
+          id: gitops
+          output: git_credentials
+        type: |-
+          list(object({
+              repo = string
+              url = string
+              username = string
+              token = string
+            }))
+        description: The credentials for the gitops repo(s)
+      - name: server_name
+        moduleRef:
+          id: gitops
+          output: server_name
+        type: string
+        description: The name of the server
+        default: default
+        optional: true
+      - name: namespace
+        moduleRef:
+          id: namespace
+          output: name
+        type: string
+        description: The namespace where the application should be deployed
+      - name: banner_background_color
+        type: string
+        description: The background color of the top banner. This value can be a named color (e.g. purple, red) or an RGB value (#FF0000).
+        default: purple
+        optional: true
+      - name: banner_text_color
+        type: string
+        description: The text color for the top banner. This value can be a named color (e.g. purple, red) or an RGB value (#FF0000).
+        default: white
+        optional: true
+      - name: banner_text
+        type: string
+        description: The text that will appear in the top banner in the cluster
+    version: v1.0.0
   - platforms:
       - kubernetes
       - ocp3
