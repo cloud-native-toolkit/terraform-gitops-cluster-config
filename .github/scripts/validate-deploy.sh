@@ -9,7 +9,7 @@ BRANCH="main"
 SERVER_NAME="default"
 TYPE="base"
 
-COMPONENT_NAME="my-module"
+COMPONENT_NAME="cluster-config"
 
 mkdir -p .testrepo
 
@@ -50,21 +50,19 @@ else
   sleep 30
 fi
 
-DEPLOYMENT="${COMPONENT_NAME}-${BRANCH}"
+NOTIFICATION="banner"
 count=0
-until kubectl get deployment "${DEPLOYMENT}" -n "${NAMESPACE}" || [[ $count -eq 20 ]]; do
-  echo "Waiting for deployment/${DEPLOYMENT} in ${NAMESPACE}"
+until kubectl get consolenotification "${NOTIFICATION}" || [[ $count -eq 20 ]]; do
+  echo "Waiting for consolenotification/${NOTIFICATION}"
   count=$((count + 1))
   sleep 15
 done
 
 if [[ $count -eq 20 ]]; then
-  echo "Timed out waiting for deployment/${DEPLOYMENT} in ${NAMESPACE}"
-  kubectl get all -n "${NAMESPACE}"
+  echo "Timed out waiting for ConsoleNotification/${NOTIFICATION}"
+  kubectl get consolenotification
   exit 1
 fi
-
-kubectl rollout status "deployment/${DEPLOYMENT}" -n "${NAMESPACE}" || exit 1
 
 cd ..
 rm -rf .testrepo
