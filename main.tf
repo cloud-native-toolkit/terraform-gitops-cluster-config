@@ -12,6 +12,7 @@ locals {
   }
   layer = "infrastructure"
   application_branch = "main"
+  gitops_url = var.gitops_config.boostrap["argocd-config"].url
   layer_config = var.gitops_config[local.layer]
 }
 
@@ -21,10 +22,11 @@ module setup_clis {
 
 resource null_resource create_yaml {
   provisioner "local-exec" {
-    command = "${path.module}/scripts/create-yaml.sh '${local.name}' '${local.yaml_dir}' '${local.values_file}'"
+    command = "${path.module}/scripts/create-yaml.sh '${local.name}' '${local.yaml_dir}' '${local.values_file}' '${local.gitops_url}'"
 
     environment = {
       VALUES_CONTENT = yamlencode(local.values_content)
+      BIN_DIR = local.bin_dir
     }
   }
 }

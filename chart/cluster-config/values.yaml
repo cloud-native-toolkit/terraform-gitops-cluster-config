@@ -21,6 +21,16 @@ first-app:
 
   displayName: First App
 
+gitops:
+  enable: true
+
+  url: "https://github.com"
+  name: gitops
+
+  location: ApplicationMenu
+
+  displayName: GitOps repo
+
 ocp-console-notification:
   name: banner
 
