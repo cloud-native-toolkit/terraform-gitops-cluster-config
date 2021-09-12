@@ -56,7 +56,7 @@ count=0
 until kubectl get consolenotification "${NOTIFICATION}" || [[ $count -eq 20 ]]; do
   echo "Waiting for consolenotification/${NOTIFICATION}"
   count=$((count + 1))
-  sleep 15
+  sleep 20
 done
 
 if [[ $count -eq 20 ]]; then
