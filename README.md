@@ -2,6 +2,7 @@
 
 Module to populate a gitops repository with base configuration of the Red Hat OpenShift cluster (notification banner, help menus, etc).
 
+
 ## Software dependencies
 
 The module depends on the following software components:
