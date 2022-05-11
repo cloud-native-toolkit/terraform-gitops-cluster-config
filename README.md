@@ -7,6 +7,7 @@ Module to populate a gitops repository with base configuration of the Red Hat Op
 
 The module depends on the following software components:
 
+
 ### Command-line tools
 
 - terraform - v14
