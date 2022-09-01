@@ -1,7 +1,9 @@
 id: github.com/cloud-native-toolkit/terraform-gitops-cluster-config
 name: gitops-cluster-config
 type: terraform
-description: Module to populate a gitops repository with base configuration of the Red Hat OpenShift cluster (notification banner, help menus, etc)
+description: >-
+  Module to populate a gitops repository with base configuration of the Red Hat
+  OpenShift cluster (notification banner, help menus, etc)
 tags:
   - tools
   - gitops
@@ -10,15 +12,127 @@ tags:
 versions:
   - platforms:
       - ocp4
+    providers:
+      - name: gitops
+        source: cloud-native-toolkit/gitops
     dependencies:
       - id: gitops
         refs:
           - source: github.com/cloud-native-toolkit/terraform-tools-gitops.git
-            version: ">= 1.1.0"
+            version: '>= 1.1.0'
       - id: namespace
         refs:
           - source: github.com/cloud-native-toolkit/terraform-gitops-namespace.git
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
+    variables:
+      - name: gitops_config
+        type: |-
+          object({
+              boostrap = object({
+                argocd-config = object({
+                  project = string
+                  repo = string
+                  url = string
+                  path = string
+                })
+              })
+              infrastructure = object({
+                argocd-config = object({
+                  project = string
+                  repo = string
+                  url = string
+                  path = string
+                })
+                payload = object({
+                  repo = string
+                  url = string
+                  path = string
+                })
+              })
+              services = object({
+                argocd-config = object({
+                  project = string
+                  repo = string
+                  url = string
+                  path = string
+                })
+                payload = object({
+                  repo = string
+                  url = string
+                  path = string
+                })
+              })
+              applications = object({
+                argocd-config = object({
+                  project = string
+                  repo = string
+                  url = string
+                  path = string
+                })
+                payload = object({
+                  repo = string
+                  url = string
+                  path = string
+                })
+              })
+            })
+        description: Config information regarding the gitops repo structure
+        moduleRef:
+          id: gitops
+          output: gitops_config
+      - name: git_credentials
+        type: |-
+          list(object({
+              repo = string
+              url = string
+              username = string
+              token = string
+            }))
+        description: The credentials for the gitops repo(s)
+        moduleRef:
+          id: gitops
+          output: git_credentials
+      - name: namespace
+        type: string
+        description: The namespace where the application should be deployed
+        moduleRef:
+          id: namespace
+          output: name
+      - name: server_name
+        type: string
+        description: The name of the server
+        default: default
+        moduleRef:
+          id: gitops
+          output: server_name
+      - name: banner_background_color
+        type: string
+        description: >-
+          The background color of the top banner. This value can be a named
+          color (e.g. purple, red) or an RGB value (#FF0000).
+        default: purple
+      - name: banner_text_color
+        type: string
+        description: >-
+          The text color for the top banner. This value can be a named color
+          (e.g. purple, red) or an RGB value (#FF0000).
+        default: white
+      - name: banner_text
+        type: string
+        description: The text that will appear in the top banner in the cluster
+    version: v1.1.0
+    outputs: []
+  - platforms:
+      - ocp4
+    dependencies:
+      - id: gitops
+        refs:
+          - source: github.com/cloud-native-toolkit/terraform-tools-gitops.git
+            version: '>= 1.1.0'
+      - id: namespace
+        refs:
+          - source: github.com/cloud-native-toolkit/terraform-gitops-namespace.git
+            version: '>= 1.0.0'
     variables:
       - name: gitops_config
         moduleRef:
@@ -103,12 +217,16 @@ versions:
         description: The namespace where the application should be deployed
       - name: banner_background_color
         type: string
-        description: The background color of the top banner. This value can be a named color (e.g. purple, red) or an RGB value (#FF0000).
+        description: >-
+          The background color of the top banner. This value can be a named
+          color (e.g. purple, red) or an RGB value (#FF0000).
         default: purple
         optional: true
       - name: banner_text_color
         type: string
-        description: The text color for the top banner. This value can be a named color (e.g. purple, red) or an RGB value (#FF0000).
+        description: >-
+          The text color for the top banner. This value can be a named color
+          (e.g. purple, red) or an RGB value (#FF0000).
         default: white
         optional: true
       - name: banner_text
@@ -123,25 +241,26 @@ versions:
       - id: gitops
         refs:
           - source: github.com/cloud-native-toolkit/terraform-tools-gitops.git
-            version: ">= 1.1.0"
+            version: '>= 1.1.0'
       - id: cluster
         refs:
           - source: github.com/ibm-garage-cloud/terraform-ibm-container-platform
-            version: ">= 1.7.0"
+            version: '>= 1.7.0'
           - source: github.com/ibm-garage-cloud/terraform-ibm-ocp-vpc
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
           - source: github.com/ibm-garage-cloud/terraform-k8s-ocp-cluster
-            version: ">= 2.0.0"
+            version: '>= 2.0.0'
       - id: namespace
         refs:
           - source: github.com/cloud-native-toolkit/terraform-gitops-namespace.git
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
       - id: argocd_bootstrap
         refs:
-          - source: github.com/cloud-native-toolkit/terraform-tools-argocd-bootstrap.git
-            version: ">= 1.0.0"
+          - source: >-
+              github.com/cloud-native-toolkit/terraform-tools-argocd-bootstrap.git
+            version: '>= 1.0.0'
           - source: github.com/cloud-native-toolkit/terraform-vsi-argocd-bootstrap.git
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
     variables:
       - name: gitops_config
         moduleRef:
@@ -232,7 +351,7 @@ versions:
           output: platform.ingress
         type: string
         description: Ingress hostname of the IKS cluster.
-        default: ""
+        default: ''
         optional: true
       - name: tls_secret_name
         moduleRef:
@@ -240,7 +359,7 @@ versions:
           output: platform.tls_secret
         type: string
         description: The name of the secret containing the tls certificate values
-        default: ""
+        default: ''
         optional: true
       - name: namespace
         moduleRef:
@@ -254,6 +373,6 @@ versions:
           output: sealed_secrets_cert
         type: string
         description: The certificate/public key used to encrypt the sealed secrets
-        default: ""
+        default: ''
         optional: true
     version: v0.0.0
