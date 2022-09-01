@@ -77,3 +77,6 @@ variable "gitops_namespace" {
 
 variable "git_username" {
 }
+
+variable "server_url" {
+}
