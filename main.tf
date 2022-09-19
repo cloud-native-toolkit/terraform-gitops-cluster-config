@@ -44,4 +44,5 @@ resource gitops_module module {
   branch = local.application_branch
   config = yamlencode(var.gitops_config)
   credentials = yamlencode(var.git_credentials)
+  value_files = "values.yaml,${local.values_file}"
 }
